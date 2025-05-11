@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Value Technologies Portal</title>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Firebase SDK imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getAuth, signInWithPopup, signOut, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+    // Firebase config (from you)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCt_whLynUWMhiMUVbxAH3UbmpauQOEYIo",
+      authDomain: "valuetech-portal.firebaseapp.com",
+      projectId: "valuetech-portal",
+      storageBucket: "valuetech-portal.firebasestorage.app",
+      messagingSenderId: "351988241643",
+      appId: "1:351988241643:web:04ab605e938edbb11b9aae",
+      measurementId: "G-PKCTZD2VCF"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ hd: "valuetechnologies.net" }); // Restrict domain
+
+    // Login function
+    window.login = () => {
+      signInWithPopup(auth, provider).catch(error => {
+        alert("Login failed: " + error.message);
+      });
+    };
+
+    // Logout function
+    window.logout = () => {
+      signOut(auth);
+    };
+
+    // Monitor user auth state
+    onAuthStateChanged(auth, user => {
+      const loginSection = document.getElementById('login-section');
+      const userSection = document.getElementById('user-section');
+      const userEmail = document.getElementById('user-email');
+
+      if (user) {
+        // Only allow emails ending in @valuetechnologies.net
+        if (!user.email.endsWith("@valuetechnologies.net")) {
+          alert("Access denied: Not a Value Technologies email.");
+          signOut(auth);
+        } else {
+          loginSection.style.display = 'none';
+          userSection.style.display = 'block';
+          userEmail.innerText = "Logged in as: " + user.email;
+        }
+      } else {
+        loginSection.style.display = 'block';
+        userSection.style.display = 'none';
+        userEmail.innerText = '';
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Welcome to Value Technologies Portal</h1>
+
+  <div id="login-section">
+    <button onclick="login()">Sign in with Google</button>
+  </div>
+
+  <div id="user-section" style="display:none;">
+    <p id="user-email"></p>
+    <button onclick="logout()">Logout</button>
+  </div>
+</body>
+</html>
